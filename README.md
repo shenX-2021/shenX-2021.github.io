@@ -89,12 +89,6 @@ git push -u origin source
 
 日常更新只需 `git push`，其余全部自动完成。也可以在 Actions 页面手动触发 `Deploy Hexo to GitHub Pages`。
 
-## 待办：改成你自己的信息
-
-- [ ] `_config.yml`：`title` / `subtitle` / `description` / `author` / `url`
-- [ ] `_config.next.yml`：`avatar.url`（侧边栏头像）、`social`（社交链接）
-- [ ] `source/about/index.md`：自我介绍
-- [ ] 删除 `source/_posts/2026-10-31-hello-hexo.md` 示例文章
 
 ## 常见问题
 
