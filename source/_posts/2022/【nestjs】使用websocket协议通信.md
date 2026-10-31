@@ -1,11 +1,12 @@
 ---
-title: 【nestjs】使用websocket协议通信
+title: 【NestJS】使用websocket协议通信
 date: 2022-07-08 18:31:04
 tags:
   - Node.js
   - NestJS
 categories: IT-Backend
 keywords: Node.js,NestJS
+description: 在NestJS环境中，需要自己实现websocket的适配器，才能完美地使用websocket的特性
 comments: true
 toc: true
 ---

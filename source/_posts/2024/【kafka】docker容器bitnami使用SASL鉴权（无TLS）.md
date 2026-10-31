@@ -5,6 +5,7 @@ tags:
   - OS
 categories: IT-OS
 keywords: OS,kafka
+description: 记录在docker容器bitnami/kafka环境下使用SASL的过程
 comments: true
 toc: true
 ---

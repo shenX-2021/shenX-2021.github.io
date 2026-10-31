@@ -5,6 +5,7 @@ tags:
   - OS
 categories: IT-OS
 keywords: OS,Go
+description: 记录在Mac ARM环境中更新Go的编译器配置来完成交叉编译
 comments: true
 toc: true
 ---

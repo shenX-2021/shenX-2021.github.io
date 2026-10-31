@@ -5,6 +5,7 @@ tags:
   - OS
 categories: IT-OS
 keywords: OS,SMTP
+description: 记录在Debian 11系统中，使用ssmtp工具实现连接163 STMP服务，发送邮件
 comments: true
 toc: true
 ---
