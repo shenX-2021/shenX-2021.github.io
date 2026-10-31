@@ -5,7 +5,7 @@ tags:
   - Node.js
   - Electron
   - vue-electron
-categories: IT
+categories: IT-Frontend
 keywords: Node.js,Electron,vue-electron
 description: 记录Electron开发遇到的坑。
 comments: true

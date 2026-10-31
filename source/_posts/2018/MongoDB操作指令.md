@@ -4,7 +4,7 @@ date: 2018-08-18 17:02:36
 tags:
   - MongoDB
   - Node.js
-categories: IT
+categories: IT-Database
 keywords: MongoDB,Node.js
 description: 记录MongoDB操作指令以及在Node.js封装MongoDB的操作方法
 comments: true

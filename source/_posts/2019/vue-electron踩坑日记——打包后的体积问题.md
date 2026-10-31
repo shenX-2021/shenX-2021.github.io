@@ -5,7 +5,7 @@ tags:
   - Node.js
   - Electron
   - vue-electron
-categories: IT
+categories: IT-Frontend
 keywords: Node.js,Electron,vue-electron
 description: Electron构建后的体积过大，可通过更改配置解决。
 comments: true

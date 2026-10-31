@@ -4,7 +4,7 @@ date: 2018-10-15 20:16:00
 tags:
   - Linux
   - OS
-categories: IT
+categories: IT-OS
 keywords: Linux,OS
 description: 记录Linux的man命令
 comments: true

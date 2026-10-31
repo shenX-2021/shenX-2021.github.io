@@ -4,7 +4,7 @@ date: 2019-06-05 10:58:05
 tags:
   - Node.js
   - Vue
-categories: IT
+categories: IT-Frontend
 keywords: Node.js,mint-ui,Vue
 description: 记录解决mint-ui中loadmore组件滑动卡顿的问题。
 comments: true
