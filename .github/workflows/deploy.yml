@@ -1,0 +1,55 @@
+name: Deploy Hexo to GitHub Pages
+
+# 触发方式：
+#   1. 推送源码到 source 分支自动部署
+#   2. 在 Actions 页面手动点击 Run workflow
+on:
+  push:
+    branches:
+      - source
+  workflow_dispatch:
+
+# 最小权限原则
+permissions:
+  contents: write
+
+# 同一分支上的多次推送只保留最新一次任务，避免并发部署冲突
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出源码
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 准备 Node 环境
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: 安装依赖
+        run: npm ci
+
+      - name: 生成静态文件
+        run: |
+          npx hexo clean
+          npx hexo generate
+
+      - name: 发布到 GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # username.github.io 类型的仓库必须从默认分支（main）根目录发布
+          # 普通项目仓库请改为 gh-pages
+          publish_branch: main
+          publish_dir: ./public
+          force_orphan: true
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+          commit_message: 'deploy: ${{ github.event.head_commit.message }}'
