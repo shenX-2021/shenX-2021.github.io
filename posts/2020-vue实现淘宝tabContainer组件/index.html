@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.2">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.min.css" integrity="sha256-4Lad8m4ZWW1Lgb9+sMVLYEfnIh7BjV1NQMEe79Pviks=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"shenx-2021.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.29.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":true}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="记录学习淘宝前端的tabContainer组件，并实现类似组件的过程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="vue实现淘宝tabContainer组件">
+<meta property="og:url" content="https://shenx-2021.github.io/posts/2020-vue%E5%AE%9E%E7%8E%B0%E6%B7%98%E5%AE%9DtabContainer%E7%BB%84%E4%BB%B6/index.html">
+<meta property="og:site_name" content="Siusen 的博客">
+<meta property="og:description" content="记录学习淘宝前端的tabContainer组件，并实现类似组件的过程">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://shenx-2021.github.io/images/2020-vue-tabContainer/taobao.gif">
+<meta property="og:image" content="https://shenx-2021.github.io/images/2020-vue-tabContainer/fail.png">
+<meta property="article:published_time" content="2020-04-06T14:18:26.000Z">
+<meta property="article:modified_time" content="2026-11-01T02:26:24.435Z">
+<meta property="article:author" content="Siusen">
+<meta property="article:tag" content="Node.js">
+<meta property="article:tag" content="Vue">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://shenx-2021.github.io/images/2020-vue-tabContainer/taobao.gif">
+
+
+<link rel="canonical" href="https://shenx-2021.github.io/posts/2020-vue%E5%AE%9E%E7%8E%B0%E6%B7%98%E5%AE%9DtabContainer%E7%BB%84%E4%BB%B6/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://shenx-2021.github.io/posts/2020-vue%E5%AE%9E%E7%8E%B0%E6%B7%98%E5%AE%9DtabContainer%E7%BB%84%E4%BB%B6/","path":"posts/2020-vue实现淘宝tabContainer组件/","title":"vue实现淘宝tabContainer组件"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>vue实现淘宝tabContainer组件 | Siusen 的博客</title>
+  
+
+
+
+
+
+
+
+
+  
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.5.0/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+<script src="/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="Siusen 的博客" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-search popup-trigger" aria-label="搜索" role="button">
+      <i class="fa fa-search fa-fw fa-lg"></i>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Siusen 的博客</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">...</p>
+  </div>
+
+  <div class="site-nav-toggle" aria-label="切换导航栏" role="button">
+      <i class="fa fa-ellipsis fa-fw fa-lg"></i>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  
+  <template id="search-popup-template"><div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div></template>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%A6%96%E5%85%88%E4%BD%93%E9%AA%8C%E4%B8%80%E4%B8%8B%E6%B7%98%E5%AE%9D%E7%9A%84tabContainer%E7%BB%84%E4%BB%B6"><span class="nav-number">1.</span> <span class="nav-text">首先体验一下淘宝的tabContainer组件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A4%B1%E8%B4%A5%E7%9A%84%E5%B0%9D%E8%AF%95"><span class="nav-number">2.</span> <span class="nav-text">失败的尝试</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8D%A2%E7%A7%8D%E6%96%B9%E5%BC%8F%E5%AE%9E%E7%8E%B0"><span class="nav-number">3.</span> <span class="nav-text">换种方式实现</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Siusen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Siusen</p>
+  <div class="site-description" itemprop="description">想到啥写啥</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">17</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://shenx-2021.github.io/posts/2020-vue%E5%AE%9E%E7%8E%B0%E6%B7%98%E5%AE%9DtabContainer%E7%BB%84%E4%BB%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Siusen">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Siusen 的博客">
+      <meta itemprop="description" content="想到啥写啥">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="vue实现淘宝tabContainer组件 | Siusen 的博客">
+      <meta itemprop="description" content="记录学习淘宝前端的tabContainer组件，并实现类似组件的过程">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          vue实现淘宝tabContainer组件
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-04-06 22:18:26" itemprop="dateCreated datePublished" datetime="2020-04-06T22:18:26+08:00">2020-04-06</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-11-01 10:26:24" itemprop="dateModified" datetime="2026-11-01T10:26:24+08:00">2026-11-01</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/IT-Frontend/" itemprop="url" rel="index"><span itemprop="name">IT-Frontend</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+            <div class="post-description">记录学习淘宝前端的tabContainer组件，并实现类似组件的过程</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>&nbsp;&nbsp;&nbsp;淘宝的tabContainer是一个值得学习的组件，本文介绍自己对淘宝tabContainer的研究，实现一个tabContainer组件。</p>
+<h4 id="首先体验一下淘宝的tabContainer组件"><a href="#首先体验一下淘宝的tabContainer组件" class="headerlink" title="首先体验一下淘宝的tabContainer组件"></a>首先体验一下淘宝的tabContainer组件</h4><p><img src="/images/2020-vue-tabContainer/taobao.gif" alt="淘宝示例"></p>
+<h4 id="失败的尝试"><a href="#失败的尝试" class="headerlink" title="失败的尝试"></a>失败的尝试</h4><p>一开始的想法是横向纵向都用滚动的方式<br><img src="/images/2020-vue-tabContainer/fail.png"><br>这个方案在chrome浏览器打开手机调试工具时，两个方向都能实现滚动，且滚动时另一个方向不会滚动。但是在手机safari浏览器就无法进行横向滚动，有兼容性问题，因此放弃。</p>
+<h4 id="换种方式实现"><a href="#换种方式实现" class="headerlink" title="换种方式实现"></a>换种方式实现</h4><p>既然横向滚动无法实现，那么通过拖拽的方式能否实现横向移动呢？然后我就将横向的滚动条去掉了，横向通过<code>touchstart</code>、<code>touchmove</code>、<code>touchend</code>的三个事件和<code>left</code>属性来控制横向的移动。</p>
+<p>附上源码：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</span><br><span class="line">  <span class="attr">methods</span>: &#123;</span><br><span class="line">    <span class="title function_">touchStart</span> (e) &#123;</span><br><span class="line">      <span class="variable language_">this</span>.<span class="property">isSliding</span> = <span class="literal">false</span>; <span class="comment">// 取消滑动动画</span></span><br><span class="line">      <span class="comment">// 获取起始坐标</span></span><br><span class="line">      <span class="variable language_">this</span>.<span class="property">initX</span> = e.<span class="property">changedTouches</span>[<span class="number">0</span>].<span class="property">clientX</span>;</span><br><span class="line">      <span class="variable language_">this</span>.<span class="property">initY</span> = e.<span class="property">changedTouches</span>[<span class="number">0</span>].<span class="property">clientY</span>;</span><br><span class="line">      <span class="comment">// 获取起始时间点</span></span><br><span class="line">      <span class="variable language_">this</span>.<span class="property">initTime</span> = <span class="title class_">Date</span>.<span class="title function_">now</span>();</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="title function_">touching</span> (e) &#123;</span><br><span class="line">      <span class="keyword">if</span> (<span class="variable language_">this</span>.<span class="property">moveType</span> === <span class="number">0</span>) &#123; <span class="comment">// 判断是横向移动还是纵向移动</span></span><br><span class="line">      	<span class="comment">// 横纵向的移动距离</span></span><br><span class="line">        <span class="keyword">let</span> deltaX = e.<span class="property">changedTouches</span>[<span class="number">0</span>].<span class="property">clientX</span> - <span class="variable language_">this</span>.<span class="property">initX</span>;</span><br><span class="line">        <span class="keyword">let</span> deltaY = e.<span class="property">changedTouches</span>[<span class="number">0</span>].<span class="property">clientY</span> - <span class="variable language_">this</span>.<span class="property">initY</span>;</span><br><span class="line">        <span class="comment">// 判断滑动的距离，横向移动大于纵向移动，则禁止纵向滑动，允许横向移动，反之亦然</span></span><br><span class="line">        <span class="keyword">if</span> (<span class="title class_">Math</span>.<span class="title function_">abs</span>(deltaX) &gt; <span class="title class_">Math</span>.<span class="title function_">abs</span>(deltaY)) <span class="variable language_">this</span>.<span class="property">moveType</span> = <span class="variable language_">this</span>.<span class="property">MOVE_TYPE_ROW</span>;</span><br><span class="line">        <span class="keyword">else</span> <span class="variable language_">this</span>.<span class="property">moveType</span> = <span class="variable language_">this</span>.<span class="property">MOVE_TYPE_COL</span>;</span><br><span class="line">      &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="variable language_">this</span>.<span class="property">moveType</span> === <span class="variable language_">this</span>.<span class="property">MOVE_TYPE_ROW</span>) &#123; <span class="comment">// 横向移动</span></span><br><span class="line">        <span class="comment">// 阻止默认动作，即不允许纵向移动</span></span><br><span class="line">        e.<span class="title function_">preventDefault</span>();</span><br><span class="line"></span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">left</span> = e.<span class="property">changedTouches</span>[<span class="number">0</span>].<span class="property">clientX</span> - <span class="variable language_">this</span>.<span class="property">initX</span>;</span><br><span class="line">        <span class="comment">// 限制横向移动不要超出范围</span></span><br><span class="line">        <span class="keyword">if</span> (<span class="variable language_">this</span>.<span class="property">initLeft</span> + <span class="variable language_">this</span>.<span class="property">left</span> &gt; <span class="number">0</span>) <span class="variable language_">this</span>.<span class="property">left</span> = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (<span class="variable language_">this</span>.<span class="property">initLeft</span> + <span class="variable language_">this</span>.<span class="property">left</span> &lt; -<span class="variable language_">this</span>.<span class="property">contentBoxWidth</span> * (<span class="variable language_">this</span>.<span class="property">navList</span>.<span class="property">length</span> - <span class="number">1</span>)) <span class="variable language_">this</span>.<span class="property">left</span> = - <span class="variable language_">this</span>.<span class="property">contentBoxWidth</span> * (<span class="variable language_">this</span>.<span class="property">navList</span>.<span class="property">length</span> - <span class="number">1</span>);</span><br><span class="line">        <span class="keyword">else</span> <span class="variable language_">this</span>.<span class="property">left</span> = <span class="variable language_">this</span>.<span class="property">left</span> + <span class="variable language_">this</span>.<span class="property">initLeft</span></span><br><span class="line">      &#125; </span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="title function_">touchEnd</span> (e) &#123;</span><br><span class="line">      <span class="comment">// 横向移动的处理</span></span><br><span class="line">      <span class="keyword">if</span> (<span class="variable language_">this</span>.<span class="property">moveType</span> === <span class="variable language_">this</span>.<span class="property">MOVE_TYPE_ROW</span>) &#123;</span><br><span class="line">        <span class="comment">// 计算滑动速度</span></span><br><span class="line">        <span class="keyword">let</span> ms = <span class="title class_">Date</span>.<span class="title function_">now</span>() - <span class="variable language_">this</span>.<span class="property">initTime</span>;</span><br><span class="line">        <span class="keyword">let</span> left = e.<span class="property">changedTouches</span>[<span class="number">0</span>].<span class="property">clientX</span> - <span class="variable language_">this</span>.<span class="property">initX</span>;</span><br><span class="line">        <span class="keyword">let</span> speed = left / ms;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> (speed &gt; <span class="variable language_">this</span>.<span class="property">SPEED_LIMIT</span>) &#123; <span class="comment">// 右滑速度超过限制，左移一个tab</span></span><br><span class="line">          <span class="variable language_">this</span>.<span class="property">currentIdx</span>--;</span><br><span class="line">          <span class="keyword">if</span> (<span class="variable language_">this</span>.<span class="property">currentIdx</span> &lt; <span class="number">0</span>) <span class="variable language_">this</span>.<span class="property">currentIdx</span> = <span class="number">0</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (speed &lt; -<span class="variable language_">this</span>.<span class="property">SPEED_LIMIT</span>) &#123; <span class="comment">// 左滑速度超过限制，右移一个tab</span></span><br><span class="line">          <span class="variable language_">this</span>.<span class="property">currentIdx</span>++;</span><br><span class="line">          <span class="keyword">if</span> (<span class="variable language_">this</span>.<span class="property">currentIdx</span> &gt; <span class="variable language_">this</span>.<span class="property">navList</span>.<span class="property">length</span> - <span class="number">1</span>) <span class="variable language_">this</span>.<span class="property">currentIdx</span> = <span class="variable language_">this</span>.<span class="property">navList</span>.<span class="property">length</span> - <span class="number">1</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123; <span class="comment">// 移动距离超过半个tab，跳到下一个tab</span></span><br><span class="line">          <span class="variable language_">this</span>.<span class="property">currentIdx</span> = <span class="title class_">Math</span>.<span class="title function_">abs</span>(<span class="built_in">parseInt</span>((<span class="variable language_">this</span>.<span class="property">left</span> - <span class="variable language_">this</span>.<span class="property">contentBoxWidth</span> / <span class="number">2</span>) / <span class="variable language_">this</span>.<span class="property">contentBoxWidth</span>));</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 使内容区移动到对应的tab页面</span></span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">left</span> = <span class="variable language_">this</span>.<span class="property">initLeft</span> = -<span class="variable language_">this</span>.<span class="property">contentBoxWidth</span> * <span class="variable language_">this</span>.<span class="property">currentIdx</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="comment">// 恢复默认值</span></span><br><span class="line">      <span class="variable language_">this</span>.<span class="property">isSliding</span> = <span class="literal">true</span>;</span><br><span class="line">      <span class="variable language_">this</span>.<span class="property">moveType</span> = <span class="number">0</span>;</span><br><span class="line">      <span class="variable language_">this</span>.<span class="property">initLeft</span> = <span class="variable language_">this</span>.<span class="property">left</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>源码可以跳转<a target="_blank" rel="noopener" href="https://github.com/gxsandzxl/ziv-vue#tab-container">Github</a>查看，有用的话请点个赞呀 ！</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Node-js/" rel="tag"># Node.js</a>
+              <a href="/tags/Vue/" rel="tag"># Vue</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/2019-socket-io-client%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E5%BB%BA%E7%AB%8Bsocket%E8%BF%9E%E6%8E%A5/" rel="prev" title="socket.io-client源码分析——建立socket连接">
+                  <i class="fa fa-angle-left"></i> socket.io-client源码分析——建立socket连接
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/2020-%E8%AE%B0%E5%BD%95%E5%BE%AE%E4%BF%A1%E5%BC%80%E5%8F%91%E7%9A%84%E5%9D%91%EF%BC%88Taro%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%92%8C%E5%85%AC%E4%BC%97%E5%8F%B7H5%EF%BC%89/" rel="next" title="记录微信开发的坑（Taro小程序和公众号H5）">
+                  记录微信开发的坑（Taro小程序和公众号H5） <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Siusen</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

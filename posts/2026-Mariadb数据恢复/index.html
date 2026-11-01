@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.2">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.min.css" integrity="sha256-4Lad8m4ZWW1Lgb9+sMVLYEfnIh7BjV1NQMEe79Pviks=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"shenx-2021.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.29.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":true}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="数据库因未开启performance_schema重启失败，导致InnoDB表frm文件异常，引发“表不存在”错误。经排查，数据文件（.ibd）完好，通过删除损坏frm、重建表结构并导入原.ibd文件成功恢复。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mariadb数据库frm文件异常，如何恢复数据">
+<meta property="og:url" content="https://shenx-2021.github.io/posts/2026-Mariadb%E6%95%B0%E6%8D%AE%E6%81%A2%E5%A4%8D/index.html">
+<meta property="og:site_name" content="Siusen 的博客">
+<meta property="og:description" content="数据库因未开启performance_schema重启失败，导致InnoDB表frm文件异常，引发“表不存在”错误。经排查，数据文件（.ibd）完好，通过删除损坏frm、重建表结构并导入原.ibd文件成功恢复。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-10-31T15:01:15.000Z">
+<meta property="article:modified_time" content="2026-11-01T02:26:24.436Z">
+<meta property="article:author" content="Siusen">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="Mariadb">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://shenx-2021.github.io/posts/2026-Mariadb%E6%95%B0%E6%8D%AE%E6%81%A2%E5%A4%8D/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://shenx-2021.github.io/posts/2026-Mariadb%E6%95%B0%E6%8D%AE%E6%81%A2%E5%A4%8D/","path":"posts/2026-Mariadb数据恢复/","title":"Mariadb数据库frm文件异常，如何恢复数据"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Mariadb数据库frm文件异常，如何恢复数据 | Siusen 的博客</title>
+  
+
+
+
+
+
+
+
+
+  
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.5.0/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+<script src="/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="Siusen 的博客" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-search popup-trigger" aria-label="搜索" role="button">
+      <i class="fa fa-search fa-fw fa-lg"></i>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Siusen 的博客</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">...</p>
+  </div>
+
+  <div class="site-nav-toggle" aria-label="切换导航栏" role="button">
+      <i class="fa fa-ellipsis fa-fw fa-lg"></i>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  
+  <template id="search-popup-template"><div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div></template>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8B%E6%95%85%E5%A7%8B%E6%9C%AB"><span class="nav-number">1.</span> <span class="nav-text">事故始末</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8E%92%E6%9F%A5%E5%8E%9F%E5%9B%A0"><span class="nav-number">2.</span> <span class="nav-text">排查原因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">3.</span> <span class="nav-text">解决方案</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E6%81%A2%E5%A4%8D%E6%95%B0%E6%8D%AE%E8%A1%A8"><span class="nav-number">3.1.</span> <span class="nav-text">如何恢复数据表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%89%B9%E9%87%8F%E6%81%A2%E5%A4%8D"><span class="nav-number">3.2.</span> <span class="nav-text">批量恢复</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83"><span class="nav-number">4.</span> <span class="nav-text">环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%8D%E7%9B%98"><span class="nav-number">5.</span> <span class="nav-text">复盘</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B3%A8%E9%87%8A"><span class="nav-number">6.</span> <span class="nav-text">注释</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Siusen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Siusen</p>
+  <div class="site-description" itemprop="description">想到啥写啥</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">17</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://shenx-2021.github.io/posts/2026-Mariadb%E6%95%B0%E6%8D%AE%E6%81%A2%E5%A4%8D/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Siusen">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Siusen 的博客">
+      <meta itemprop="description" content="想到啥写啥">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Mariadb数据库frm文件异常，如何恢复数据 | Siusen 的博客">
+      <meta itemprop="description" content="数据库因未开启performance_schema重启失败，导致InnoDB表frm文件异常，引发“表不存在”错误。经排查，数据文件（.ibd）完好，通过删除损坏frm、重建表结构并导入原.ibd文件成功恢复。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Mariadb数据库frm文件异常，如何恢复数据
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-10-31 23:01:15" itemprop="dateCreated datePublished" datetime="2026-10-31T23:01:15+08:00">2026-10-31</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-11-01 10:26:24" itemprop="dateModified" datetime="2026-11-01T10:26:24+08:00">2026-11-01</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/IT-Database/" itemprop="url" rel="index"><span itemprop="name">IT-Database</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+            <div class="post-description">数据库因未开启performance_schema重启失败，导致InnoDB表frm文件异常，引发“表不存在”错误。经排查，数据文件（.ibd）完好，通过删除损坏frm、重建表结构并导入原.ibd文件成功恢复。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="事故始末"><a href="#事故始末" class="headerlink" title="事故始末"></a>事故始末</h2><p>在查询数据库性能问题时，发现performance_schema配置没有开启，立马更新配置，重启数据库。没想到数据库重启失败。修改force_recovery后数据库启动了，但所有业务数据表都无法查询了，抛出了<code>Table &#39;db_xx.tb_xx&#39; doesn&#39;t exist in engine</code>的异常。</p>
+<h2 id="排查原因"><a href="#排查原因" class="headerlink" title="排查原因"></a>排查原因</h2><p><code>Table &#39;db_xx.tb_xx&#39; doesn&#39;t exist in engine</code>的问题是由于frm^1^文件异常，数据库无法正常加载。这个问题可能和数据库重启失败有关。<br>数据库为何重启失败，直接原因是数据库重启时无法正常加载和InnoDB engine，确实后续发现无法正常查询的表都是使用InnoDB engine的，包括Mariadb的三个系统表（mysql.innodb_table_stats^2^, mysql.innodb_index_stats^3^, mysql.gtid_slave_pos^4^）。但我无法确定重启失败的根本原因，猜测有以下两种可能：</p>
+<ul>
+<li>重启数据库时还有很多服务正在访问数据库，突然的重启导致Mariadb无法正确地处理请求，进而使数据库崩溃。</li>
+<li>performance_schema的配置导致Mariadb在重启时发生了异常。</li>
+</ul>
+<p>我没有深究真正的诱因，但我猜测第一个的可能更大。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><h4 id="如何恢复数据表"><a href="#如何恢复数据表" class="headerlink" title="如何恢复数据表"></a>如何恢复数据表</h4><p>经过排查，只是frm（表结构）文件异常，而ibd^5^（数据文件）文件正常。因此，通过以下步骤恢复数据。</p>
+<ol>
+<li>请关闭访问数据库的相关服务，以免在恢复期遇上无法预料的问题。</li>
+<li>删除损坏的表结构文件：进入对应数据库目录，删除报错表相关的 .frm &#x2F; .ibd 文件（<strong>请先做好完整备份！</strong>）。</li>
+<li>重新创建表结构：在 phpMyAdmin 或客户端中，用原本的 CREATE TABLE 语句重新创建该表（去掉外键约束等可能干扰的条件）。</li>
+<li>丢弃新表的表空间：<code>ALTER TABLE xxx.xxx DISCARD TABLESPACE;</code></li>
+<li>将原有的 .ibd 文件拷回该数据库目录，并赋予正确的用户权限（如 mysql:mysql）。</li>
+<li>导入表空间： <code>ALTER TABLE xxx.xxx IMPORT TABLESPACE;</code></li>
+</ol>
+<h4 id="批量恢复"><a href="#批量恢复" class="headerlink" title="批量恢复"></a>批量恢复</h4><p>由于数据表数量过大，手动执行效率过低且容易出错，因此，将手动执行的流程转换成相应的脚本。相关代码请参考<a target="_blank" rel="noopener" href="https://github.com/shenX-2021/shenX-2021.github.io/tree/source/example/20261031-mariadb">Github</a>。</p>
+<h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><ul>
+<li>OS: CentOS Linux 7 (Core)</li>
+<li>Mariadb: 10.2.10-MariaDB</li>
+</ul>
+<h2 id="复盘"><a href="#复盘" class="headerlink" title="复盘"></a>复盘</h2><p>事故发生的很突然，虽然最终顺利解决，但还是要从中吸取教训：</p>
+<ol>
+<li>不要贸然重启数据库，重启前一定要做好<strong>备份</strong>。</li>
+<li>当发生事故时，先不要做修复，还是先要做好<strong>备份</strong>，以便重试。</li>
+<li>如果你不是专业的DBA或公司没有DBA，尽量避免使用外键约束（Foreign Key Constraint）、存储过程（Stored Procedure）、触发器（Trigger）和视图（View）等数据库特性，即把能用代码实现的不要放在数据库。这些都有可能为成为修复数据库上的绊脚石。</li>
+</ol>
+<h2 id="注释"><a href="#注释" class="headerlink" title="注释"></a>注释</h2><ol>
+<li>FoRM​ 的缩写，是 MySQL &#x2F; MariaDB 中存储表结构定义的文件。</li>
+<li>InnoDB 的持久化表级统计信息表，用来给查询优化器判断执行计划的。</li>
+<li>InnoDB 的持久化索引级别的统计信息，同样只给查询优化器用。</li>
+<li>MariaDB 的 GTID 复制位点表，专门给从库（replica）记“我复制到哪了”。</li>
+<li>InnoDB Datafile，是 InnoDB 存储引擎的表数据文件，存放表的实际数据 + 索引。</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+              <a href="/tags/Mariadb/" rel="tag"># Mariadb</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/2024-go%E8%A7%A3%E6%9E%90%E5%90%ABpassphrase%E7%9A%84pem%E7%A7%98%E9%92%A5/" rel="prev" title="go解析含passphrase的pem秘钥">
+                  <i class="fa fa-angle-left"></i> go解析含passphrase的pem秘钥
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Siusen</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

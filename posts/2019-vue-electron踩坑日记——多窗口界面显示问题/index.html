@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.2">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.min.css" integrity="sha256-4Lad8m4ZWW1Lgb9+sMVLYEfnIh7BjV1NQMEe79Pviks=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"shenx-2021.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.29.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":true}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="vue-electron踩坑日记——多窗口界面显示问题">
+<meta property="og:type" content="article">
+<meta property="og:title" content="vue-electron踩坑日记——多窗口界面显示问题">
+<meta property="og:url" content="https://shenx-2021.github.io/posts/2019-vue-electron%E8%B8%A9%E5%9D%91%E6%97%A5%E8%AE%B0%E2%80%94%E2%80%94%E5%A4%9A%E7%AA%97%E5%8F%A3%E7%95%8C%E9%9D%A2%E6%98%BE%E7%A4%BA%E9%97%AE%E9%A2%98/index.html">
+<meta property="og:site_name" content="Siusen 的博客">
+<meta property="og:description" content="vue-electron踩坑日记——多窗口界面显示问题">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i-blog.csdnimg.cn/blog_migrate/fe081d5ec2d5ec36c6d7550509c0b6e6.png">
+<meta property="article:published_time" content="2019-04-20T02:16:35.000Z">
+<meta property="article:modified_time" content="2026-11-01T02:26:24.435Z">
+<meta property="article:author" content="Siusen">
+<meta property="article:tag" content="Electron">
+<meta property="article:tag" content="Node.js">
+<meta property="article:tag" content="vue-electron">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i-blog.csdnimg.cn/blog_migrate/fe081d5ec2d5ec36c6d7550509c0b6e6.png">
+
+
+<link rel="canonical" href="https://shenx-2021.github.io/posts/2019-vue-electron%E8%B8%A9%E5%9D%91%E6%97%A5%E8%AE%B0%E2%80%94%E2%80%94%E5%A4%9A%E7%AA%97%E5%8F%A3%E7%95%8C%E9%9D%A2%E6%98%BE%E7%A4%BA%E9%97%AE%E9%A2%98/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://shenx-2021.github.io/posts/2019-vue-electron%E8%B8%A9%E5%9D%91%E6%97%A5%E8%AE%B0%E2%80%94%E2%80%94%E5%A4%9A%E7%AA%97%E5%8F%A3%E7%95%8C%E9%9D%A2%E6%98%BE%E7%A4%BA%E9%97%AE%E9%A2%98/","path":"posts/2019-vue-electron踩坑日记——多窗口界面显示问题/","title":"vue-electron踩坑日记——多窗口界面显示问题"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>vue-electron踩坑日记——多窗口界面显示问题 | Siusen 的博客</title>
+  
+
+
+
+
+
+
+
+
+  
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.5.0/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+<script src="/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="Siusen 的博客" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-search popup-trigger" aria-label="搜索" role="button">
+      <i class="fa fa-search fa-fw fa-lg"></i>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Siusen 的博客</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">...</p>
+  </div>
+
+  <div class="site-nav-toggle" aria-label="切换导航栏" role="button">
+      <i class="fa fa-ellipsis fa-fw fa-lg"></i>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  
+  <template id="search-popup-template"><div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div></template>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E9%97%AE%E9%A2%98%E6%8F%8F%E8%BF%B0%E5%8F%8A%E5%8E%9F%E5%9B%A0%E5%88%86%E6%9E%90"><span class="nav-number">1.</span> <span class="nav-text">1.问题描述及原因分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E8%B8%A9%E5%9D%91%E8%BF%87%E7%A8%8B"><span class="nav-number">2.</span> <span class="nav-text">2.踩坑过程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3%E3%80%81%E5%BE%85%E8%A7%A3%E5%86%B3%E9%97%AE%E9%A2%98"><span class="nav-number">3.</span> <span class="nav-text">3、待解决问题</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4%E3%80%81demo"><span class="nav-number">4.</span> <span class="nav-text">4、demo</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Siusen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Siusen</p>
+  <div class="site-description" itemprop="description">想到啥写啥</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">17</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://shenx-2021.github.io/posts/2019-vue-electron%E8%B8%A9%E5%9D%91%E6%97%A5%E8%AE%B0%E2%80%94%E2%80%94%E5%A4%9A%E7%AA%97%E5%8F%A3%E7%95%8C%E9%9D%A2%E6%98%BE%E7%A4%BA%E9%97%AE%E9%A2%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Siusen">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Siusen 的博客">
+      <meta itemprop="description" content="想到啥写啥">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="vue-electron踩坑日记——多窗口界面显示问题 | Siusen 的博客">
+      <meta itemprop="description" content="vue-electron踩坑日记——多窗口界面显示问题">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          vue-electron踩坑日记——多窗口界面显示问题
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-04-20 10:16:35" itemprop="dateCreated datePublished" datetime="2019-04-20T10:16:35+08:00">2019-04-20</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-11-01 10:26:24" itemprop="dateModified" datetime="2026-11-01T10:26:24+08:00">2026-11-01</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/IT-Frontend/" itemprop="url" rel="index"><span itemprop="name">IT-Frontend</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+            <div class="post-description">vue-electron踩坑日记——多窗口界面显示问题</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p><em>本文仅针对vue-electron库打包后多窗口页面空白（主窗口页面正常显示）的问题解决，如果在主窗口页面就已经无法显示了，请自行百度或参考<a target="_blank" rel="noopener" href="http://www.cnblogs.com/xueyoucd/p/8006610.html">electron入坑指南</a>。</em> </p>
+<h4 id="1-问题描述及原因分析"><a href="#1-问题描述及原因分析" class="headerlink" title="1.问题描述及原因分析"></a>1.问题描述及原因分析</h4><p> &ensp; &ensp; &ensp; 因项目需要制作一个桌面字幕系统，实现方案是通过主窗口打开字幕窗口显示字幕。在本地测试服务器跑通之后，通过electron-builder打包exe，成功后运行，主窗口一切正常，字幕窗口一片空白。<br>  &ensp; &ensp; &ensp; 因为字幕窗口是无边框的透明窗体，我一度认为是BrowserWindow的配置出现问题，在这折腾半天，后来发现无论我如何修改配置，字幕窗口都是空白页面，忽然明白了不是electron的窗口问题，是vue中的页面代码没有加载出来。于是去修改打包环境的加载url，发现了一个问题——主窗口的页面路由都没有问题，但是其他窗口的路由都失效了。通过思考，我认为electron在打包的时候可能把路由地址访问都换成桌面程序的调转方式，所以访问vue路由地址便无法获取页面，主窗口访问的是html文件，所以能显示，页面跳转也被electron做了处理，而字幕窗口因为是路由访问地址，地址已经被electron处理了，所以自然无法显示页面了。<br> &ensp; &ensp; &ensp; 想要解决这个问题，就需要给每个窗口都增加一个入口文件，然而，vue默认是SPA（单页面应用），所有交互和界面都在一个页面完成，入口文件当然也只有一个。解决方案是：寻找vue多页面应用的配置，为每一个窗口添加一个入口文件。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/gxsandzxl/vue-electron-muti-page">demo</a></p>
+<h4 id="2-踩坑过程"><a href="#2-踩坑过程" class="headerlink" title="2.踩坑过程"></a>2.踩坑过程</h4><p> &ensp; &ensp; &ensp;第一步当然是让vue成为多页面应用啦，参考此篇文章<a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000011265006?utm_source=tag-newest">用vue构建多页面应用</a>。步骤如下：<br>  &ensp; &ensp; &ensp;&ensp; &ensp;1、在配置文件目录下新增<code>muti-page.config.js</code></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> glob = <span class="built_in">require</span>(<span class="string">&#x27;glob&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">&#x27;path&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> <span class="variable constant_">PAGE_PATH</span> = path.<span class="title function_">resolve</span>(__dirname, <span class="string">&#x27;../src/renderer/page&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> <span class="title class_">HtmlWebpackPlugin</span> = <span class="built_in">require</span>(<span class="string">&#x27;html-webpack-plugin&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">exports</span>.<span class="property">entries</span> = <span class="keyword">function</span> (<span class="params"></span>) &#123;</span><br><span class="line">  <span class="comment">/*用于匹配 pages 下一级文件夹中的 index.js 文件 */</span></span><br><span class="line">  <span class="keyword">var</span> entryFiles = glob.<span class="title function_">sync</span>(<span class="variable constant_">PAGE_PATH</span> + <span class="string">&#x27;/*/main.js&#x27;</span>)</span><br><span class="line">  <span class="keyword">var</span> map = &#123;&#125;</span><br><span class="line">  entryFiles.<span class="title function_">forEach</span>(<span class="function">(<span class="params">filePath</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">/* 下述两句代码用于取出 pages 下一级文件夹的名称 */</span></span><br><span class="line">    <span class="keyword">var</span> entryPath = path.<span class="title function_">dirname</span>(filePath)</span><br><span class="line">    <span class="keyword">var</span> filename = entryPath.<span class="title function_">substring</span>(entryPath.<span class="title function_">lastIndexOf</span>(<span class="string">&#x27;\/&#x27;</span>) + <span class="number">1</span>)</span><br><span class="line">    <span class="comment">/* 生成对应的键值对 */</span></span><br><span class="line">    map[filename] = filePath</span><br><span class="line">  &#125;)</span><br><span class="line">  <span class="keyword">return</span> map</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">exports</span>.<span class="property">htmlPlugin</span> = <span class="keyword">function</span> (<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">let</span> entryHtml = glob.<span class="title function_">sync</span>(<span class="variable constant_">PAGE_PATH</span> + <span class="string">&#x27;/*/index.ejs&#x27;</span>)</span><br><span class="line">  <span class="keyword">let</span> arr = []</span><br><span class="line">  entryHtml.<span class="title function_">forEach</span>(<span class="function">(<span class="params">filePath</span>) =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">var</span> entryPath = path.<span class="title function_">dirname</span>(filePath)</span><br><span class="line">      <span class="keyword">var</span> filename = entryPath.<span class="title function_">substring</span>(entryPath.<span class="title function_">lastIndexOf</span>(<span class="string">&#x27;\/&#x27;</span>) + <span class="number">1</span>)</span><br><span class="line">      <span class="keyword">let</span> conf = &#123;</span><br><span class="line">        <span class="attr">template</span>: filePath,</span><br><span class="line">        <span class="attr">filename</span>: filename + <span class="string">`/index.html`</span>,</span><br><span class="line">        <span class="attr">chunks</span>: [<span class="string">&#x27;manifest&#x27;</span>, <span class="string">&#x27;vendor&#x27;</span>, filename],</span><br><span class="line">        <span class="attr">inject</span>: <span class="literal">true</span>,</span><br><span class="line">        <span class="attr">nodeModules</span>: path.<span class="title function_">resolve</span>(__dirname, <span class="string">&#x27;../node_modules&#x27;</span>)</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">if</span> (process.<span class="property">env</span>.<span class="property">NODE_ENV</span> === <span class="string">&#x27;production&#x27;</span>) &#123;</span><br><span class="line">        <span class="keyword">let</span> productionConfig = &#123;</span><br><span class="line">          <span class="attr">minify</span>: &#123;</span><br><span class="line">            <span class="attr">removeComments</span>: <span class="literal">true</span>,         <span class="comment">// 移除注释</span></span><br><span class="line">            <span class="attr">collapseWhitespace</span>: <span class="literal">true</span>,     <span class="comment">// 删除空白符和换行符</span></span><br><span class="line">            <span class="attr">removeAttributeQuotes</span>: <span class="literal">true</span>   <span class="comment">// 移除属性引号 </span></span><br><span class="line">          &#125;,</span><br><span class="line">          <span class="attr">chunksSortMode</span>: <span class="string">&#x27;dependency&#x27;</span>    <span class="comment">// 对引入的chunk模块进行排序</span></span><br><span class="line">        &#125;</span><br><span class="line">        conf = &#123;...conf, ...productionConfig&#125; <span class="comment">//合并基础配置和生产环境专属配置</span></span><br><span class="line">      &#125;</span><br><span class="line">      arr.<span class="title function_">push</span>(<span class="keyword">new</span> <span class="title class_">HtmlWebpackPlugin</span>(conf))</span><br><span class="line">  &#125;)</span><br><span class="line">  <span class="keyword">return</span> arr</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p> &ensp; &ensp; &ensp;&ensp; &ensp;2、在<code>webpack.renderer.config.js</code>做以下改动<br> <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment">// 为了避免篇幅过长，删去无关的配置</span></span><br><span class="line"> <span class="keyword">let</span> rendererConfig = &#123;</span><br><span class="line">  <span class="comment">// 将入口改为自定义入口，注意，这里的entries是function，不是object，否则在测试环境会报错</span></span><br><span class="line">  <span class="comment">// entry: &#123;</span></span><br><span class="line">  <span class="comment">//   renderer: path.join(__dirname, &#x27;../src/renderer/main.js&#x27;)</span></span><br><span class="line">  <span class="comment">// &#125;,</span></span><br><span class="line">  <span class="attr">entry</span>: entries,</span><br><span class="line">  <span class="attr">plugins</span>: [</span><br><span class="line">    <span class="keyword">new</span> <span class="title class_">VueLoaderPlugin</span>(),</span><br><span class="line">    <span class="keyword">new</span> <span class="title class_">MiniCssExtractPlugin</span>(&#123;<span class="attr">filename</span>: <span class="string">&#x27;styles.css&#x27;</span>&#125;),</span><br><span class="line">    <span class="comment">// new HtmlWebpackPlugin(&#123;</span></span><br><span class="line">    <span class="comment">//   filename: &#x27;index.html&#x27;,</span></span><br><span class="line">    <span class="comment">//   template: path.resolve(__dirname, &#x27;../src/index.ejs&#x27;),</span></span><br><span class="line">    <span class="comment">//   minify: &#123;</span></span><br><span class="line">    <span class="comment">//     collapseWhitespace: true,</span></span><br><span class="line">    <span class="comment">//     removeAttributeQuotes: true,</span></span><br><span class="line">    <span class="comment">//     removeComments: true</span></span><br><span class="line">    <span class="comment">//   &#125;,</span></span><br><span class="line">    <span class="comment">//   nodeModules: path.resolve(__dirname, &#x27;../node_modules&#x27;)</span></span><br><span class="line">    <span class="comment">//     // process.env.NODE_ENV !== &#x27;production&#x27;</span></span><br><span class="line">    <span class="comment">//     // ? path.resolve(__dirname, &#x27;../node_modules&#x27;)</span></span><br><span class="line">    <span class="comment">//     // : false</span></span><br><span class="line">    <span class="comment">// &#125;),</span></span><br><span class="line">    <span class="keyword">new</span> webpack.<span class="title class_">HotModuleReplacementPlugin</span>(),</span><br><span class="line">    <span class="keyword">new</span> webpack.<span class="title class_">NoEmitOnErrorsPlugin</span>()</span><br><span class="line">    <span class="comment">// 注释原来的HtmlWebpackPlugin插件代码，在数组后添加.concat(htmlPlugin())</span></span><br><span class="line">  ].<span class="title function_">concat</span>(<span class="title function_">htmlPlugin</span>()),</span><br><span class="line">  <span class="attr">output</span>: &#123;</span><br><span class="line">  <span class="comment">// 修改filename的[name].js 为[name]/index.js，1、是为了将js文件和html文件归类在一起；2、[name].js时html访问的是绝对路径</span></span><br><span class="line">    <span class="attr">filename</span>: <span class="string">&#x27;[name]/index.js&#x27;</span>,</span><br><span class="line">    <span class="attr">libraryTarget</span>: <span class="string">&#x27;commonjs2&#x27;</span>,</span><br><span class="line">    <span class="attr">path</span>: path.<span class="title function_">join</span>(__dirname, <span class="string">&#x27;../dist/electron&#x27;</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br> &ensp; &ensp; &ensp;&ensp; &ensp;3、渲染目录结构<br> &ensp; &ensp; &ensp;&ensp;  <img src="https://i-blog.csdnimg.cn/blog_migrate/fe081d5ec2d5ec36c6d7550509c0b6e6.png" alt="在这里插入图片描述"><br>  &ensp; &ensp; &ensp;&ensp; &ensp;4、package.json配置，依然参考这篇文章<a target="_blank" rel="noopener" href="http://www.cnblogs.com/xueyoucd/p/8006610.html">electron入坑指南</a><br>  <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">&quot;build&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;productName&quot;</span><span class="punctuation">:</span> <span class="string">&quot;shorthands&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;appId&quot;</span><span class="punctuation">:</span> <span class="string">&quot;com.example.shorthands&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;directories&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;output&quot;</span><span class="punctuation">:</span> <span class="string">&quot;build&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;app&quot;</span><span class="punctuation">:</span> <span class="string">&quot;.&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;files&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">    <span class="string">&quot;./**/*&quot;</span></span><br><span class="line">  <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;dmg&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;contents&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">      <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;x&quot;</span><span class="punctuation">:</span> <span class="number">410</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;y&quot;</span><span class="punctuation">:</span> <span class="number">150</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;link&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;path&quot;</span><span class="punctuation">:</span> <span class="string">&quot;/Applications&quot;</span></span><br><span class="line">      <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;x&quot;</span><span class="punctuation">:</span> <span class="number">130</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;y&quot;</span><span class="punctuation">:</span> <span class="number">150</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;file&quot;</span></span><br><span class="line">      <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">]</span></span><br><span class="line">  <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;mac&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;icon&quot;</span><span class="punctuation">:</span> <span class="string">&quot;build/icons/icon.icns&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;win&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;icon&quot;</span><span class="punctuation">:</span> <span class="string">&quot;build/icons/icon.ico&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;linux&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;icon&quot;</span><span class="punctuation">:</span> <span class="string">&quot;build/icons&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure></p>
+<h4 id="3、待解决问题"><a href="#3、待解决问题" class="headerlink" title="3、待解决问题"></a>3、待解决问题</h4><p>  &ensp; &ensp; &ensp;&ensp; 1、<a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_41855143/article/details/89680108">打包后项目过大（应该引入node_modules的问题）</a><br>    &ensp; &ensp; &ensp;&ensp; 2、打包成安装包</p>
+<h4 id="4、demo"><a href="#4、demo" class="headerlink" title="4、demo"></a>4、demo</h4><p><a target="_blank" rel="noopener" href="https://github.com/gxsandzxl/vue-electron-muti-page">demo</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Node-js/" rel="tag"># Node.js</a>
+              <a href="/tags/Electron/" rel="tag"># Electron</a>
+              <a href="/tags/vue-electron/" rel="tag"># vue-electron</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/2019-electron%E8%B8%A9%E5%9D%91%E6%97%A5%E8%AE%B0/" rel="prev" title="Electron踩坑日记">
+                  <i class="fa fa-angle-left"></i> Electron踩坑日记
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/2019-vue-electron%E8%B8%A9%E5%9D%91%E6%97%A5%E8%AE%B0%E2%80%94%E2%80%94%E6%89%93%E5%8C%85%E5%90%8E%E7%9A%84%E4%BD%93%E7%A7%AF%E9%97%AE%E9%A2%98/" rel="next" title="vue-electron踩坑日记——构建后的体积问题">
+                  vue-electron踩坑日记——构建后的体积问题 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Siusen</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

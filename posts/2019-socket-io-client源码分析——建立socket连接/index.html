@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.2">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.min.css" integrity="sha256-4Lad8m4ZWW1Lgb9+sMVLYEfnIh7BjV1NQMEe79Pviks=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"shenx-2021.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.29.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"mac"},"fold":{"enable":false,"height":500},"language":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":true}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="socket.io-client源码分析——建立socket连接">
+<meta property="og:type" content="article">
+<meta property="og:title" content="socket.io-client源码分析——建立socket连接">
+<meta property="og:url" content="https://shenx-2021.github.io/posts/2019-socket-io-client%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E5%BB%BA%E7%AB%8Bsocket%E8%BF%9E%E6%8E%A5/index.html">
+<meta property="og:site_name" content="Siusen 的博客">
+<meta property="og:description" content="socket.io-client源码分析——建立socket连接">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i-blog.csdnimg.cn/blog_migrate/f4fa8f717d308b7e8aefc2c7bd7ab01b.png">
+<meta property="article:published_time" content="2019-12-28T15:56:36.000Z">
+<meta property="article:modified_time" content="2026-11-01T02:26:24.435Z">
+<meta property="article:author" content="Siusen">
+<meta property="article:tag" content="Node.js">
+<meta property="article:tag" content="socket.io">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i-blog.csdnimg.cn/blog_migrate/f4fa8f717d308b7e8aefc2c7bd7ab01b.png">
+
+
+<link rel="canonical" href="https://shenx-2021.github.io/posts/2019-socket-io-client%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E5%BB%BA%E7%AB%8Bsocket%E8%BF%9E%E6%8E%A5/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://shenx-2021.github.io/posts/2019-socket-io-client%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E5%BB%BA%E7%AB%8Bsocket%E8%BF%9E%E6%8E%A5/","path":"posts/2019-socket-io-client源码分析——建立socket连接/","title":"socket.io-client源码分析——建立socket连接"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>socket.io-client源码分析——建立socket连接 | Siusen 的博客</title>
+  
+
+
+
+
+
+
+
+
+  
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.5.0/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+<script src="/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<link rel="alternate" href="/atom.xml" title="Siusen 的博客" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-search popup-trigger" aria-label="搜索" role="button">
+      <i class="fa fa-search fa-fw fa-lg"></i>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Siusen 的博客</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">...</p>
+  </div>
+
+  <div class="site-nav-toggle" aria-label="切换导航栏" role="button">
+      <i class="fa fa-ellipsis fa-fw fa-lg"></i>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  
+  <template id="search-popup-template"><div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div></template>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%B6%E6%9E%84%E5%88%86%E6%9E%90"><span class="nav-number">2.</span> <span class="nav-text">架构分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90"><span class="nav-number">3.</span> <span class="nav-text">源码分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Siusen"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Siusen</p>
+  <div class="site-description" itemprop="description">想到啥写啥</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">17</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://shenx-2021.github.io/posts/2019-socket-io-client%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E5%BB%BA%E7%AB%8Bsocket%E8%BF%9E%E6%8E%A5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Siusen">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Siusen 的博客">
+      <meta itemprop="description" content="想到啥写啥">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="socket.io-client源码分析——建立socket连接 | Siusen 的博客">
+      <meta itemprop="description" content="socket.io-client源码分析——建立socket连接">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          socket.io-client源码分析——建立socket连接
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-12-28 23:56:36" itemprop="dateCreated datePublished" datetime="2019-12-28T23:56:36+08:00">2019-12-28</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-11-01 10:26:24" itemprop="dateModified" datetime="2026-11-01T10:26:24+08:00">2026-11-01</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/IT-Frontend/" itemprop="url" rel="index"><span itemprop="name">IT-Frontend</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+            <div class="post-description">socket.io-client源码分析——建立socket连接</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><blockquote>
+<p>socket.io是一种用于服务端和客户端的双向通信的js库，提供了长轮询和websocket这两种实现方式socket.io-client是其在客户端的实现。socket.io-client通过方法on监听来自服务器的通信，通过方法emit向服务器传递信息。</p>
+</blockquote>
+<p><strong>socket.io-client</strong>对外暴露相关api，处理与外界的交互，对外界数据通过<strong>socket.io-parser</strong>库解析成<strong>socket.io-protocol</strong>规定的格式数据源，通过底层引擎库<strong>engine.io-client</strong>传输至服务器。同时监听<strong>engine.io-client</strong>从服务器获取的返回信息。</p>
+<h3 id="架构分析"><a href="#架构分析" class="headerlink" title="架构分析"></a>架构分析</h3><p>&emsp; &emsp; socket.io-client库内部分为两个类，<code>Manager</code>和<code>Socket</code>。分别连接内部引擎和外部沟通，互相之间通讯方式参照node.js中Event Emitter的方式。</p>
+<p>&emsp; &emsp; <code>Manager</code>类负责对整个库的管理和处理，对<code>Socket</code>传来的信息编码后传递到engine.io-client，处理socket的错误和异常。当收到engine.io-client的信息时，解码后传递给<code>Socket</code>。<br>&emsp; &emsp; <code>Socket</code>类负责外部的api，暴露emit、on、once、disconnect等方法，对外部的信息进行处理传递到<code>Manager</code>。</p>
+<h3 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h3><p><img src="https://i-blog.csdnimg.cn/blog_migrate/f4fa8f717d308b7e8aefc2c7bd7ab01b.png" alt="在这里插入图片描述"><br>&emsp; &emsp; 上图是socket.io-client建立连接的流程图，可以看出来是比较简单的。初始<code>Manager</code>类和<code>Socket</code>类，在<code>Manager</code>初始化的同时，初始化引擎，引擎负责与服务器通知，<code>Manager</code>负责与引擎通信，将通信内容通过<code>Socket</code>类传递到外部。</p>
+<p> <strong>接下来我们看源码:</strong></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">lookup</span> (<span class="params">uri, opts</span>) &#123;</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">typeof</span> uri === <span class="string">&#x27;object&#x27;</span>) &#123;</span><br><span class="line">    opts = uri;</span><br><span class="line">    uri = <span class="literal">undefined</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 初始化参数，这里只保留了必要的参数</span></span><br><span class="line">  opts = opts || &#123;&#125;;</span><br><span class="line">  <span class="keyword">let</span> parsed = <span class="title function_">url</span>(uri); <span class="comment">// 将uri字符串转换为包含host、port、query等字段的对象</span></span><br><span class="line">  <span class="keyword">let</span> source = parsed.<span class="property">source</span>; <span class="comment">// 请求的原地址，即uri</span></span><br><span class="line">  <span class="keyword">let</span> newConnection = <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 初始化Manager类，目前只做了新连接的初始化</span></span><br><span class="line">  <span class="keyword">let</span> io;</span><br><span class="line">  <span class="keyword">if</span> (newConnection === <span class="literal">true</span>) &#123;</span><br><span class="line">    io = <span class="title class_">Manager</span>(source, opts);</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">// 这里对Manage实例进行缓存，这里不做介绍</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (parsed.<span class="property">query</span> &amp;&amp; !opts.<span class="property">query</span>) &#123;</span><br><span class="line">    opts.<span class="property">query</span> = parsed.<span class="property">query</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 初始化Socket类</span></span><br><span class="line">  <span class="keyword">return</span> io.<span class="title function_">socket</span>(parsed.<span class="property">path</span>, opts);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>&emsp; &emsp; 上面是<strong>socket.io-client</strong>的入口函数，只做了三件事，初始化参数、初始化<code>Manager</code>类实例、初始化<code>Socket</code>类实例，然后向外暴露<code>Socket</code>实例。<br>&emsp; &emsp; 我们按顺序逐步分析，调用<code>io = Manager(source, opts);</code>后发生了：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Manager类的构造函数</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">Manager</span> (<span class="params">uri, opts</span>) &#123;</span><br><span class="line">  <span class="keyword">if</span> (!(<span class="variable language_">this</span> <span class="keyword">instanceof</span> <span class="title class_">Manager</span>)) <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Manager</span>(uri, opts);</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">typeof</span> uri === <span class="string">&#x27;object&#x27;</span>) &#123;</span><br><span class="line">    opts = uri;</span><br><span class="line">    uri = <span class="literal">undefined</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  opts = opts || &#123;&#125;;</span><br><span class="line"></span><br><span class="line">  opts.<span class="property">path</span>  = opts.<span class="property">path</span> || <span class="string">&#x27;/socket.io&#x27;</span>; <span class="comment">// 这里是真实的请求路径，uri上的请求路径实际上是socket的命名空间，这里需要加以区分</span></span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">nsps</span> = &#123;&#125;; <span class="comment">// 不同命名空间的socket的缓存</span></span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">subs</span> = []; <span class="comment">// 事件或定时器销毁的缓存列表</span></span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">opts</span> = opts; <span class="comment">// 参数</span></span><br><span class="line">  <span class="variable language_">this</span>.<span class="title function_">reconnection</span>(opts.<span class="property">reconnection</span> !== <span class="literal">false</span>); <span class="comment">// 是否自动重连</span></span><br><span class="line">  <span class="variable language_">this</span>.<span class="title function_">reconnectionAttempts</span>(opts.<span class="property">reconnectionAttempts</span> || <span class="title class_">Infinity</span>); <span class="comment">// 重连次数</span></span><br><span class="line">  <span class="variable language_">this</span>.<span class="title function_">reconnectionDelay</span>(opts.<span class="property">reconnectionDelay</span> || <span class="number">1000</span>); <span class="comment">// 重连间隔时间</span></span><br><span class="line">  <span class="variable language_">this</span>.<span class="title function_">reconnectionDelayMax</span>(opts.<span class="property">reconnectionDelayMax</span> || <span class="number">5000</span>); <span class="comment">// 重连间隔时间上限，即最长的重连间隔时间</span></span><br><span class="line">  <span class="variable language_">this</span>.<span class="title function_">randomizationFactor</span>(opts.<span class="property">randomizationFactor</span> || <span class="number">0.5</span>); <span class="comment">// 随机数因子，作为间隔时间随机增长的参数之一</span></span><br><span class="line">  <span class="comment">// backoff实例，用户记录和刷新间隔时间和重连次数</span></span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">backoff</span> = <span class="keyword">new</span> <span class="title class_">Backoff</span>(&#123;</span><br><span class="line">    <span class="attr">min</span>: <span class="variable language_">this</span>.<span class="title function_">reconnectionDelay</span>(),</span><br><span class="line">    <span class="attr">max</span>: <span class="variable language_">this</span>.<span class="title function_">reconnectionDelayMax</span>(),</span><br><span class="line">    <span class="attr">jitter</span>: <span class="variable language_">this</span>.<span class="title function_">randomizationFactor</span>()</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">  <span class="variable language_">this</span>.<span class="title function_">timeout</span>(<span class="literal">null</span> == opts.<span class="property">timeout</span> ? <span class="number">20000</span> : opts.<span class="property">timeout</span>); <span class="comment">// 连接超时时长</span></span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">readyState</span> = <span class="string">&#x27;closed&#x27;</span>; <span class="comment">// 连接状态，默认为closed</span></span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">uri</span> = uri; <span class="comment">// 链接地址</span></span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">connecting</span> = []; <span class="comment">// 当前处于连接状态的socket列表</span></span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">lastPing</span> = <span class="literal">null</span>; <span class="comment">// 最近一次心跳检测的时间</span></span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">encoding</span> = <span class="literal">false</span>; <span class="comment">// 当前是否正在编码</span></span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">packetBuffer</span> = []; <span class="comment">// 数据包缓冲区</span></span><br><span class="line">  <span class="keyword">var</span> _parser = opts.<span class="property">parser</span> || parser; <span class="comment">// 编解码工具，默认使用基于socket.io-protocol的socket.io-parser库</span></span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">encoder</span> = <span class="keyword">new</span> _parser.<span class="title class_">Encoder</span>(); <span class="comment">// 编码器</span></span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">decoder</span> = <span class="keyword">new</span> _parser.<span class="title class_">Decoder</span>(); <span class="comment">// 解码器</span></span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">autoConnect</span> = opts.<span class="property">autoConnect</span> !== <span class="literal">false</span>; <span class="comment">// 是否自动连接，默认是</span></span><br><span class="line">  <span class="keyword">if</span> (<span class="variable language_">this</span>.<span class="property">autoConnect</span>) <span class="variable language_">this</span>.<span class="title function_">open</span>(); <span class="comment">// 如果自动连接，则开始连接</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>&emsp; &emsp; 上面是<code>Manager</code>类的构造函数，调用后会返回一个<code>Manager</code>实例，函数内主要是对一些重要的属性进行初始化，以及进行自动连接服务器（默认情况下）。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">Manager</span>.<span class="property"><span class="keyword">prototype</span></span>.<span class="property">open</span> =</span><br><span class="line"><span class="title class_">Manager</span>.<span class="property"><span class="keyword">prototype</span></span>.<span class="property">connect</span> = <span class="keyword">function</span> (<span class="params">fn, opts</span>) &#123;</span><br><span class="line">  <span class="comment">// 如果当前状态为open(已连接)或opening(连接中)，则不需要重复连接</span></span><br><span class="line">  <span class="keyword">if</span> (~<span class="variable language_">this</span>.<span class="property">readyState</span>.<span class="title function_">indexOf</span>(<span class="string">&#x27;open&#x27;</span>) <span class="keyword">return</span> <span class="variable language_">this</span>;</span><br><span class="line">  </span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">engine</span> = <span class="title function_">eio</span>(<span class="variable language_">this</span>.<span class="property">uri</span>, <span class="variable language_">this</span>.<span class="property">opts</span>); <span class="comment">// 初始化engine.io-client的实例</span></span><br><span class="line">  <span class="keyword">var</span> socket = <span class="variable language_">this</span>.<span class="property">engine</span>;</span><br><span class="line">  <span class="keyword">var</span> <span class="variable language_">self</span> = <span class="variable language_">this</span>;</span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">readyState</span> = <span class="string">&#x27;opening&#x27;</span>; <span class="comment">// 连接状态改为opening(正在连接)</span></span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">skipReconnect</span> = <span class="literal">false</span>; <span class="comment">// 是否跳过重连</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// 监听engine的open实践，出发此事件表明连接已建立</span></span><br><span class="line">  <span class="keyword">var</span> openSub = <span class="title function_">on</span>(socket, <span class="string">&#x27;open&#x27;</span>, <span class="keyword">function</span> (<span class="params"></span>) &#123;</span><br><span class="line">    <span class="variable language_">self</span>.<span class="title function_">onopen</span>(); <span class="comment">// 这里就是连接成功的后续处理。后面再展开来讲</span></span><br><span class="line">    fn &amp;&amp; <span class="title function_">fn</span>(); <span class="comment">// 有回调则触发回调</span></span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 监听engine的error事件，连接失败时出发此事件</span></span><br><span class="line">  <span class="keyword">var</span> errorSub = <span class="title function_">on</span>(socket, <span class="string">&#x27;error&#x27;</span>, <span class="keyword">function</span> (<span class="params">data</span>) &#123;</span><br><span class="line">    <span class="variable language_">self</span>.<span class="title function_">cleanup</span>(); <span class="comment">// 清除缓存</span></span><br><span class="line">    <span class="variable language_">self</span>.<span class="property">readyState</span> = <span class="string">&#x27;closed&#x27;</span>; <span class="comment">// 连接状态为closed</span></span><br><span class="line">    <span class="variable language_">self</span>.<span class="title function_">emitAll</span>(<span class="string">&#x27;connect_error&#x27;</span>, data); <span class="comment">// 广播所有socket连接触发connect_error事件</span></span><br><span class="line">    <span class="keyword">if</span> (fn) &#123; <span class="comment">// 如果有回调函数则调用回调函数</span></span><br><span class="line">      <span class="keyword">var</span> err = <span class="keyword">new</span> <span class="title class_">Error</span>(<span class="string">&#x27;Connection error&#x27;</span>);</span><br><span class="line">      err.<span class="property">data</span> = data;</span><br><span class="line">      <span class="title function_">fn</span>(err);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123; <span class="comment">// 没有则判断是否需要重连，这里只在第一次自动连接时发生</span></span><br><span class="line">      <span class="comment">// Only do this if there is no fn to handle the error</span></span><br><span class="line">      <span class="variable language_">self</span>.<span class="title function_">maybeReconnectOnOpen</span>();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 如果没有取消超时设置，则默认有个连接超时处理</span></span><br><span class="line">  <span class="keyword">if</span> (<span class="literal">false</span> !== <span class="variable language_">this</span>.<span class="property">_timeout</span>) &#123;</span><br><span class="line">    <span class="keyword">var</span> timeout = <span class="variable language_">this</span>.<span class="property">_timeout</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置定时器，超过预定时间则触发超时</span></span><br><span class="line">    <span class="keyword">var</span> timer = <span class="built_in">setTimeout</span>(<span class="keyword">function</span> (<span class="params"></span>) &#123;</span><br><span class="line">      openSub.<span class="title function_">destroy</span>(); <span class="comment">// 销毁open事件的监听回调</span></span><br><span class="line">      socket.<span class="title function_">close</span>(); <span class="comment">// 关闭socket</span></span><br><span class="line">      socket.<span class="title function_">emit</span>(<span class="string">&#x27;error&#x27;</span>, <span class="string">&#x27;timeout&#x27;</span>); <span class="comment">// 触发error事件</span></span><br><span class="line">      <span class="variable language_">self</span>.<span class="title function_">emitAll</span>(<span class="string">&#x27;connect_timeout&#x27;</span>, timeout); <span class="comment">// 广播connect_error事件</span></span><br><span class="line">    &#125;, timeout);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 将定时任务的销毁推入订阅缓存</span></span><br><span class="line">    <span class="variable language_">this</span>.<span class="property">subs</span>.<span class="title function_">push</span>(&#123;</span><br><span class="line">      <span class="attr">destroy</span>: <span class="keyword">function</span> (<span class="params"></span>) &#123;</span><br><span class="line">        <span class="built_in">clearTimeout</span>(timer);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">subs</span>.<span class="title function_">push</span>(openSub); <span class="comment">// 将open事件的销毁推入订阅缓存</span></span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">subs</span>.<span class="title function_">push</span>(errorSub); <span class="comment">// 将error事件的销毁推入订阅缓存</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="variable language_">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>&emsp; &emsp; 在这里，做了以下五个步骤：1、初始化引擎；2、修改状态为opening；3、监听引擎的<code>open</code>和<code>error</code>事件；4、默认进行超时处理；5、将监听事件和定时器的销毁方法存入缓存。<br>&emsp; &emsp; <code>eio</code>是<code>socket.io-client</code>的引擎(即<code>engine.io-client</code>)的部分，负责核心的连接控制、请求发送与相应、心跳检测，使<code>socket.io-client</code> 能更多地关注与外部的沟通。<code>engine.io-client</code>的原理也将会在后续文章进行探讨。<br>&emsp; &emsp; <code>open</code>函数执行完后，<code>Manager</code>实例便生成了，接下来就是<code>Socket</code>类的初始化实例过程。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Manager类的实例方法socket，向外暴露新建或缓存中的socket实例</span></span><br><span class="line"><span class="title class_">Manager</span>.<span class="property"><span class="keyword">prototype</span></span>.<span class="property">socket</span> = <span class="keyword">function</span> (<span class="params">nsp, opts</span>) &#123;</span><br><span class="line">  <span class="comment">// 获取socket缓存</span></span><br><span class="line">  <span class="keyword">var</span> socket = <span class="variable language_">this</span>.<span class="property">nsps</span>[nsp];</span><br><span class="line">  <span class="keyword">if</span> (!socket) &#123; <span class="comment">// 不存在，则生成新的Socket实例</span></span><br><span class="line">    socket = <span class="keyword">new</span> <span class="title class_">Socket</span>(<span class="variable language_">this</span>, nsp, opts); <span class="comment">// 生成Socket实例</span></span><br><span class="line">    <span class="variable language_">this</span>.<span class="property">nsps</span>[nsp] = socket; <span class="comment">// 缓存Socket实例</span></span><br><span class="line">    <span class="keyword">var</span> <span class="variable language_">self</span> = <span class="variable language_">this</span>;</span><br><span class="line">    socket.<span class="title function_">on</span>(<span class="string">&#x27;connecting&#x27;</span>, onConnecting); <span class="comment">// 监听connecting事件</span></span><br><span class="line">    socket.<span class="title function_">on</span>(<span class="string">&#x27;connect&#x27;</span>, <span class="keyword">function</span> (<span class="params"></span>) &#123; <span class="comment">// 监听connect事件</span></span><br><span class="line">      socket.<span class="property">id</span> = <span class="variable language_">self</span>.<span class="title function_">generateId</span>(nsp); <span class="comment">// 连接成功后生成一个唯一标识，服务器通过此标识可以区分不同的socket连接</span></span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="comment">// 如果是自动连接的话，socket将不会收到connecting监听的回调，因为在监听之前，已经触发了connecting事件了</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="variable language_">this</span>.<span class="property">autoConnect</span>) &#123;</span><br><span class="line">      <span class="title function_">onConnecting</span>();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// connecting的回调处理函数</span></span><br><span class="line">  <span class="keyword">function</span> <span class="title function_">onConnecting</span> (<span class="params"></span>) &#123;</span><br><span class="line">  	<span class="comment">// 如果socket不在缓存列表内，则将其添加到connecting缓存</span></span><br><span class="line">    <span class="keyword">if</span> (!~<span class="title function_">indexOf</span>(<span class="variable language_">self</span>.<span class="property">connecting</span>, socket)) &#123;</span><br><span class="line">      <span class="variable language_">self</span>.<span class="property">connecting</span>.<span class="title function_">push</span>(socket);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> socket;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Socket类的构造函数</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">Socket</span> (<span class="params">io, nsp, opts</span>) &#123;</span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">io</span> = io; <span class="comment">// Manager类实例</span></span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">nsp</span> = nsp; <span class="comment">// 命名空间</span></span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">ids</span> = <span class="number">0</span>; <span class="comment">// ack编号，用于识别ack应答的回调函数</span></span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">acks</span> = &#123;&#125;; <span class="comment">// 存储ack回调函数</span></span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">receiveBuffer</span> = []; <span class="comment">// 在连接建立前，将服务器传来的数据包传入此缓存列表，连接成功后，传递到外部。</span></span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">sendBuffer</span> = []; <span class="comment">// 在连接建立之前，将外部需要传递到服务器的数据包添加到此缓存，连接成功后，传递到服务器</span></span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">connected</span> = <span class="literal">false</span>; <span class="comment">// 是否已连接</span></span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">disconnected</span> = <span class="literal">true</span>; <span class="comment">// 是否已断开连接</span></span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">flags</span> = &#123;&#125;; <span class="comment">// 对数据包编码标志，用于解析数据包采用何种编接码形式的判断</span></span><br><span class="line">  <span class="keyword">if</span> (opts &amp;&amp; opts.<span class="property">query</span>) &#123;</span><br><span class="line">    <span class="variable language_">this</span>.<span class="property">query</span> = opts.<span class="property">query</span>; <span class="comment">// 参数</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> (<span class="variable language_">this</span>.<span class="property">io</span>.<span class="property">autoConnect</span>) <span class="variable language_">this</span>.<span class="title function_">open</span>(); <span class="comment">// 自动连接</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>&emsp; &emsp; <code>Manager</code>类的<code>socket</code>方法用于获取新的或缓存中的<code>Socket</code>实例，向外暴露指定命名空间的实例。<code>Socket</code>类实例化过程，也是初始化了指定的属性，以及在可自动连接的情况下进行连接。值得注意的一点是<code>receiveBuffer</code>和<code>sendBuffer</code>这两个属性，为什么需要两个属性呢？因为http请求是异步的，数据的接收指令和发送指令可能先于请求的响应，在响应到达前，这些指令是不允许执行的，因此需要有个缓存，在请求响应后，一次性将指令进行对应的处理。<br>&emsp; &emsp;接着看<code>Socket</code>类实例方法<code>open</code>：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">Socket</span>.<span class="property"><span class="keyword">prototype</span></span>.<span class="property">open</span> =</span><br><span class="line"><span class="title class_">Socket</span>.<span class="property"><span class="keyword">prototype</span></span>.<span class="property">connect</span> = <span class="keyword">function</span> (<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">if</span> (<span class="variable language_">this</span>.<span class="property">connected</span>) <span class="keyword">return</span> <span class="variable language_">this</span>; <span class="comment">// 如果已连接，则返回</span></span><br><span class="line"></span><br><span class="line">  <span class="variable language_">this</span>.<span class="title function_">subEvents</span>(); <span class="comment">// 订阅Manager类的open、packet、close事件</span></span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">io</span>.<span class="title function_">open</span>(); <span class="comment">// 这里是为了确保调用了Manager的open方法，如果已连接，此方法不做任何处理，详情看上方open方法的源码</span></span><br><span class="line">  <span class="comment">// 如果状态是open，并且命名空间不为/，则发送一个连接包到服务器，服务器鉴权</span></span><br><span class="line">  <span class="keyword">if</span> (<span class="string">&#x27;open&#x27;</span> === <span class="variable language_">this</span>.<span class="property">io</span>.<span class="property">readyState</span>) <span class="variable language_">this</span>.<span class="title function_">onopen</span>();</span><br><span class="line">  <span class="variable language_">this</span>.<span class="title function_">emit</span>(<span class="string">&#x27;connecting&#x27;</span>); <span class="comment">// 通知外部连接中...</span></span><br><span class="line">  <span class="keyword">return</span> <span class="variable language_">this</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>&emsp; &emsp;上面是<code>open</code>和<code>connect</code>方法的源码。可以看出，<code>open</code>和<code>connect</code>是完全一样的方法，当我们不进行自动连接时，可以通过<code>connect()</code>或者<code>open()</code>来进行手动连接。<br>&emsp; &emsp;这里可能会有个疑问，**连接不上已经建立了吗？为什么还需要发送连接包到服务器呢？**这里就需要理解初始化引擎时发生了什么，引擎向发送了一条GET的http请求，请求格式是有规定的，例如<code>http://localhost:2000/socket.io/?param1=123&amp;EIO=3&amp;transport=polling&amp;t=MywSF5v.0&amp;b64=1</code>，服务器地址、端口、路径、以及相关参数，其中路径必须为<code>/socket.io</code>，EIO为3，transport默认为polling，后续引擎通过判断当前环境是否允许升级为websocket，来过渡到websocket。如果相关参数以及网络没有问题，会收到一条响应信息<code>96:0{&quot;sid&quot;:&quot;iqJ7v1aSsJTAwA1aAAAB&quot;,&quot;upgrades&quot;:[&quot;websocket&quot;],&quot;pingInterval&quot;:25000,&quot;pingTimeout&quot;:5000}2:40</code>。经过<code>engine.io-parser</code>解码后生成两个JSON包，为<code>{type:  &quot;open&quot;, data: {sid: &quot;iqJ7v1aSsJTAwA1aAAAB&quot;, upgrades: [&quot;websocket&quot;], &quot;pingInterval&quot;:25000, &quot;pingTimeout&quot;:5000}}</code>、<code>{type:&quot;message&quot;, data: 0}</code>。<br>&emsp; &emsp;首先我们看第一个JSON包<code>{type:  &quot;open&quot;, data: {sid: &quot;iqJ7v1aSsJTAwA1aAAAB&quot;, upgrades: [&quot;websocket&quot;], &quot;pingInterval&quot;:25000, &quot;pingTimeout&quot;:5000}}</code>，’<code>open</code>类型的包使引擎状态改为已连接，并做相关处理，触发<code>Manager</code>监听的事件<code>open</code>，<code>Manager</code>监听的<code>open</code>事件的回调如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">Socket</span>.<span class="property"><span class="keyword">prototype</span></span>.<span class="property">onopen</span> = <span class="keyword">function</span> (<span class="params"></span>) &#123;</span><br><span class="line">  <span class="title function_">debug</span>(<span class="string">&#x27;transport is open - connecting&#x27;</span>);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 如果命名空间不为/的话，则需要发送一个connect包到服务器判断是否存在該命名空间的连接。</span></span><br><span class="line">  <span class="keyword">if</span> (<span class="string">&#x27;/&#x27;</span> !== <span class="variable language_">this</span>.<span class="property">nsp</span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="variable language_">this</span>.<span class="property">query</span>) &#123;</span><br><span class="line">      <span class="comment">// 带有参数的包</span></span><br><span class="line">      <span class="keyword">var</span> query = <span class="keyword">typeof</span> <span class="variable language_">this</span>.<span class="property">query</span> === <span class="string">&#x27;object&#x27;</span> ? parseqs.<span class="title function_">encode</span>(<span class="variable language_">this</span>.<span class="property">query</span>) : <span class="variable language_">this</span>.<span class="property">query</span>;</span><br><span class="line">      <span class="title function_">debug</span>(<span class="string">&#x27;sending connect packet with query %s&#x27;</span>, query);</span><br><span class="line">      <span class="variable language_">this</span>.<span class="title function_">packet</span>(&#123;<span class="attr">type</span>: parser.<span class="property">CONNECT</span>, <span class="attr">query</span>: query&#125;);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="comment">// 不带参数的包</span></span><br><span class="line">      <span class="variable language_">this</span>.<span class="title function_">packet</span>(&#123;<span class="attr">type</span>: parser.<span class="property">CONNECT</span>&#125;);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>&emsp; &emsp;为什么需要发送这个包呢？在<code>socket.io</code>的机制里，引擎第一个请求是获取一些必要的参数和连接包(即第二个包)，如<code>sid</code>(此次连接的唯一标识)、<code>upgrades</code>(可升级的协议列表)、<code>pingInterval</code>(心跳检测的间隔时间)、<code>pingTimeout</code>(心跳检测的超时时间)，只要请求是满足<code>socket.io</code>协议规定的格式，就能收到对应的响应信息，但这次请求并没有包括对命名空间的检测，因此，<strong>需要客户端需要对非默认命名空间的连接额外做一次连接鉴权请求(发送<code>connect</code>包)</strong>。<br>&emsp; &emsp;接下来看第二个JSON包<code>{type:&quot;message&quot;, data: 0}</code>。<code>engine.io-client</code>通过触发事件<code>data</code>将<code>message</code>类型的包中的<code>data</code>(也就是<code>0</code>)传递到<code>socket.io-client</code>的<code>Manager</code>实例中，<code>Manager</code>实例触发回调后会进行解码，代码如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">Manager</span>.<span class="property"><span class="keyword">prototype</span></span>.<span class="property">ondata</span> = <span class="keyword">function</span> (<span class="params">data</span>) &#123;</span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">decoder</span>.<span class="title function_">add</span>(data); <span class="comment">// 利用socket.io-parser的解码器解码来自engine.io-client的数据</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>&emsp; &emsp;解码过程这里不做展开，解码后数据以JSON形式呈现，这里的数据<code>0</code>将被解码为<code>{type: 0, nsp: &quot;/&quot;}</code>，<code>type: 0</code>指的是数据包类型为<code>connect</code>，<code>nsp: &quot;/&quot;</code>指的是命名空间为<code>/</code>，解码器解码后的数据会经过以下处理：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 解码器解码后触发的回调</span></span><br><span class="line"><span class="title class_">Manager</span>.<span class="property"><span class="keyword">prototype</span></span>.<span class="property">ondecoded</span> = <span class="keyword">function</span> (<span class="params">packet</span>) &#123;</span><br><span class="line">  <span class="variable language_">this</span>.<span class="title function_">emit</span>(<span class="string">&#x27;packet&#x27;</span>, packet); <span class="comment">// 触发事件packet</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 事件packet的回调</span></span><br><span class="line"><span class="title class_">Socket</span>.<span class="property"><span class="keyword">prototype</span></span>.<span class="property">onpacket</span> = <span class="keyword">function</span> (<span class="params">packet</span>) &#123;</span><br><span class="line">  <span class="keyword">var</span> sameNamespace = packet.<span class="property">nsp</span> === <span class="variable language_">this</span>.<span class="property">nsp</span>; <span class="comment">// 数据包的命名空间是否与本地的命名空间一样</span></span><br><span class="line">  <span class="keyword">var</span> rootNamespaceError = packet.<span class="property">type</span> === parser.<span class="property">ERROR</span> &amp;&amp; packet.<span class="property">nsp</span> === <span class="string">&#x27;/&#x27;</span>; <span class="comment">// 当数据包的命名空间是/，并且包类型为error</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// 当命名空间不一致，且数据包不为error时，将抛弃这个数据包，例如&#123;type: 0, nsp: &quot;/&quot;&#125;，本地nsp不为/</span></span><br><span class="line">  <span class="keyword">if</span> (!sameNamespace &amp;&amp; !rootNamespaceError) <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 根据数据包类型不一样，进行不同处理</span></span><br><span class="line">  <span class="keyword">switch</span> (packet.<span class="property">type</span>) &#123;</span><br><span class="line">    <span class="keyword">case</span> parser.<span class="property">CONNECT</span>: <span class="comment">// 0</span></span><br><span class="line">      <span class="variable language_">this</span>.<span class="title function_">onconnect</span>();</span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> parser.<span class="property">EVENT</span>: <span class="comment">// 2</span></span><br><span class="line">      <span class="variable language_">this</span>.<span class="title function_">onevent</span>(packet);</span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> parser.<span class="property">BINARY_EVENT</span>: <span class="comment">// 5</span></span><br><span class="line">      <span class="variable language_">this</span>.<span class="title function_">onevent</span>(packet);</span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> parser.<span class="property">ACK</span>: <span class="comment">// 3</span></span><br><span class="line">      <span class="variable language_">this</span>.<span class="title function_">onack</span>(packet);</span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> parser.<span class="property">BINARY_ACK</span>: <span class="comment">// 6</span></span><br><span class="line">      <span class="variable language_">this</span>.<span class="title function_">onack</span>(packet);</span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> parser.<span class="property">DISCONNECT</span>: <span class="comment">// 1</span></span><br><span class="line">      <span class="variable language_">this</span>.<span class="title function_">ondisconnect</span>();</span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> parser.<span class="property">ERROR</span>: <span class="comment">// 4</span></span><br><span class="line">      <span class="variable language_">this</span>.<span class="title function_">emit</span>(<span class="string">&#x27;error&#x27;</span>, packet.<span class="property">data</span>);</span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// 收到连接包后，建立连接的处理</span></span><br><span class="line"><span class="title class_">Socket</span>.<span class="property"><span class="keyword">prototype</span></span>.<span class="property">onconnect</span> = <span class="keyword">function</span> (<span class="params"></span>) &#123;</span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">connected</span> = <span class="literal">true</span>; <span class="comment">// 是否已连接</span></span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">disconnected</span> = <span class="literal">false</span>; <span class="comment">// 是否断开连接</span></span><br><span class="line">  <span class="variable language_">this</span>.<span class="title function_">emit</span>(<span class="string">&#x27;connect&#x27;</span>, <span class="string">&#x27;small connect&#x27;</span>);  <span class="comment">// 通知外部连接已建立，触发connect事件回调</span></span><br><span class="line">  <span class="variable language_">this</span>.<span class="title function_">emitBuffered</span>(); <span class="comment">// 处理缓存</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// 缓存处理</span></span><br><span class="line"><span class="title class_">Socket</span>.<span class="property"><span class="keyword">prototype</span></span>.<span class="property">emitBuffered</span> = <span class="keyword">function</span> (<span class="params"></span>) &#123;</span><br><span class="line">  <span class="title function_">debug</span>(<span class="string">&#x27;reciveBuffer: %o&#x27;</span>, <span class="variable language_">this</span>.<span class="property">receiveBuffer</span>)</span><br><span class="line">  <span class="keyword">var</span> i;</span><br><span class="line">  <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; <span class="variable language_">this</span>.<span class="property">receiveBuffer</span>.<span class="property">length</span>; i++) &#123;</span><br><span class="line">    emit.<span class="title function_">apply</span>(<span class="variable language_">this</span>, <span class="variable language_">this</span>.<span class="property">receiveBuffer</span>[i]); <span class="comment">// 将接受的事件包发射到外部</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">receiveBuffer</span> = [];</span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; <span class="variable language_">this</span>.<span class="property">sendBuffer</span>.<span class="property">length</span>; i++) &#123;</span><br><span class="line">    <span class="variable language_">this</span>.<span class="title function_">packet</span>(<span class="variable language_">this</span>.<span class="property">sendBuffer</span>[i]); <span class="comment">// 将外部传递的事件包发射到engine传递到服务器</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">sendBuffer</span> = [];</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>&emsp; &emsp;当开始建立连接时，第一个收到的包是连接包(<code>{type: 0, nsp: &quot;/&quot;}</code>)，如果外部连接的命名空间不为<code>/</code>，会检测到命名空间不匹配，然后丢弃这个包，并且在连接成功前，服务器传来的数据包将缓存在<code>receiveBuffer</code>队列，外部传来的数据包将缓存在<code>sendBuffer </code>队列。直到收到相匹配的命名空间的连接包，建立连接成功后，将这些缓存逐一处理。<br>&emsp; &emsp;到这里，建立socket连接就算是完成了。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>&emsp; &emsp;<code>socket.io-client</code>库负责与外部通讯、将外部不同类型的数据转化为内部数据，将内部数据解析为事件或ack回调、重连机制、超时处理、异常通知。它的连接过程像是搭一座桥，将外部与内部引擎连接起来。<br>&emsp; &emsp;下一篇文章，将介绍外部和服务器是如何通过这座桥的。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Node-js/" rel="tag"># Node.js</a>
+              <a href="/tags/socket-io/" rel="tag"># socket.io</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/2019-vue%EF%BC%8Cmint-ui%E8%A7%A3%E5%86%B3loadmore%E7%BB%84%E4%BB%B6%E6%BB%91%E5%8A%A8%E5%8D%A1%E9%A1%BF%E7%9A%84%E9%97%AE%E9%A2%98/" rel="prev" title="vue，mint-ui解决loadmore组件滑动卡顿的问题">
+                  <i class="fa fa-angle-left"></i> vue，mint-ui解决loadmore组件滑动卡顿的问题
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/2020-vue%E5%AE%9E%E7%8E%B0%E6%B7%98%E5%AE%9DtabContainer%E7%BB%84%E4%BB%B6/" rel="next" title="vue实现淘宝tabContainer组件">
+                  vue实现淘宝tabContainer组件 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Siusen</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>
